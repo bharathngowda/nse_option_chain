@@ -30,11 +30,11 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "github-actions"
         git add --all
-        if [ -z "$(git status --porcelain)" ]; then
-           echo "push=false" >> $GITHUB_OUTPUT"
+        if [-z "$(git status --porcelain)"]; then
+           echo "::set-output name=push::false"
         else
            git commit -m "updated the file" -a
-           echo "push=true" >> $GITHUB_OUTPUT"
+           echo "::set-output name=push::true"
         fi
       shell: bash
     - name: Push changes
