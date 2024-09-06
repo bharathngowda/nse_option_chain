@@ -24,58 +24,64 @@ headers = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "X-Requested-With": "XMLHttpRequest"
 }
+attempt=1
 
-# Make a GET request to the API endpoint
-response = requests.get(api_url, headers=headers)
-
-# Check if the request was successful
-if response.status_code == 200:
-    # Load the JSON data
-    data = response.json()
-
-    # Extract the necessary part of the JSON data
+# Making upto 10 API tries before exiting
+while attempt<10:
+    print(attempt)
     try:
-        # Extract 'records' which contains the option data
-        records = data['records']['data']
-
-        # Initialize lists to hold call and put option data
-        call_data = []
-        put_data = []
-
-        # Iterate over each record
-        for record in records:
-            if 'CE' in record:
-                call_data.append(record['CE'])
-            if 'PE' in record:
-                put_data.append(record['PE'])
-
-        # Convert lists to DataFrames
-        df_calls = pd.DataFrame(call_data)
-        df_puts = pd.DataFrame(put_data)
-
-        # Reindex DataFrames to ensure column alignment
-        df_calls = df_calls.reindex(columns=pd.Index(sorted(df_calls.columns), name='CE'))
-        df_puts = df_puts.reindex(columns=pd.Index(sorted(df_puts.columns), name='PE'))
-
-        # Combine both DataFrames
-        option_chain = pd.concat([df_calls, df_puts], axis=1)
-
-        # Create multi-level columns
-        call_columns = pd.MultiIndex.from_product([['CALLS'], df_calls.columns], names=['Type', 'Attribute'])
-        put_columns = pd.MultiIndex.from_product([['PUTS'], df_puts.columns], names=['Type', 'Attribute'])
-        option_chain_columns = call_columns.append(put_columns)
-
-        # Reassign the columns to the DataFrame
-        option_chain.columns = option_chain_columns
-
-        # Converting to datetime object
-        option_chain[('CALLS','expiryDate')]=pd.to_datetime(option_chain[('CALLS','expiryDate')],format='%d-%b-%Y')
-        option_chain[('PUTS','expiryDate')]=pd.to_datetime(option_chain[('PUTS','expiryDate')],format='%d-%b-%Y')
-
-    except KeyError as e:
-        print(f"KeyError: {e} - The expected key was not found in the JSON response.")
-else:
-    print(f"Request failed with status code {response.status_code}")
+        # Make a GET request to the API endpoint
+        response = requests.get(api_url, headers=headers)
+    
+        # Load the JSON data
+        data = response.json()
+    
+        # Extract the necessary part of the JSON data
+        try:
+            # Extract 'records' which contains the option data
+            records = data['records']['data']
+    
+            # Initialize lists to hold call and put option data
+            call_data = []
+            put_data = []
+    
+            # Iterate over each record
+            for record in records:
+                if 'CE' in record:
+                    call_data.append(record['CE'])
+                if 'PE' in record:
+                    put_data.append(record['PE'])
+    
+            # Convert lists to DataFrames
+            df_calls = pd.DataFrame(call_data)
+            df_puts = pd.DataFrame(put_data)
+    
+            # Reindex DataFrames to ensure column alignment
+            df_calls = df_calls.reindex(columns=pd.Index(sorted(df_calls.columns), name='CE'))
+            df_puts = df_puts.reindex(columns=pd.Index(sorted(df_puts.columns), name='PE'))
+    
+            # Combine both DataFrames
+            option_chain = pd.concat([df_calls, df_puts], axis=1)
+    
+            # Create multi-level columns
+            call_columns = pd.MultiIndex.from_product([['CALLS'], df_calls.columns], names=['Type', 'Attribute'])
+            put_columns = pd.MultiIndex.from_product([['PUTS'], df_puts.columns], names=['Type', 'Attribute'])
+            option_chain_columns = call_columns.append(put_columns)
+    
+            # Reassign the columns to the DataFrame
+            option_chain.columns = option_chain_columns
+    
+            # Converting to datetime object
+            option_chain[('CALLS','expiryDate')]=pd.to_datetime(option_chain[('CALLS','expiryDate')],format='%d-%b-%Y')
+            option_chain[('PUTS','expiryDate')]=pd.to_datetime(option_chain[('PUTS','expiryDate')],format='%d-%b-%Y')
+    
+        except KeyError as e:
+            print(f"KeyError: {e} - The expected key was not found in the JSON response.")
+    except:
+        print(f"Request failed with status code {response.status_code}")
+        attempt=attempt+1
+        continue
+    break
 
 
 # In[3]:
