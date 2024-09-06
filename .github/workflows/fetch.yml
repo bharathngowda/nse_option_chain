@@ -1,4 +1,4 @@
-name: output creation
+name: nse_option_chain_data_fetch
 on: 
   workflow_dispatch:
   schedule:
