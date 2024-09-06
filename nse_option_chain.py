@@ -89,7 +89,7 @@ while attempt<10:
 
 # Exporting to excel
 if option_chain.empty==False:
-    option_chain.to_excel('option_chain_' + datetime.now().strftime('%Y%m%d%H%M%S') + '.xlsx')
+    option_chain.to_excel('data/option_chain_' + datetime.now().strftime('%Y%m%d%H%M%S') + '.xlsx')
 
 
 
