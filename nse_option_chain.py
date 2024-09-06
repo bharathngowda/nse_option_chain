@@ -7,7 +7,6 @@
 import requests
 import pandas as pd
 from datetime import datetime
-from github import Github
 
 
 # In[2]:
@@ -86,8 +85,6 @@ else:
 if option_chain.empty==False:
     option_chain.to_excel('option_chain_' + datetime.now().strftime('%Y%m%d%H%M%S') + '.xlsx')
 
-
-# In[5]:
 
 
 
