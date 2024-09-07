@@ -1,8 +1,8 @@
 name: nse_option_chain_data_fetch
 on: 
-  workflow_dispatch:
-  schedule:
-    - cron: '*/5 9-15 * * *'
+  #workflow_dispatch:
+  #schedule:
+    #- cron: '*/5 9-15 * * *'
 
 
 jobs:
